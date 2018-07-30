@@ -9,8 +9,8 @@ namespace Labirint_prog
         {
             public int y;   // координаты в print_arr
             public int x;
-            public bool use;
-            public int num;
+            public bool use;	// использована ли ячейка
+            public int num;		// порядковый номер ячейки
             // наличие/отсутствие границ
             public bool right_w;    // справа
             public bool left_w;     // слева
@@ -162,7 +162,7 @@ namespace Labirint_prog
             return flag;
         }
 
-        public void Print()
+        public void Print()	// "печатает" результат в консоль
         {
             for (int i = 0; i < print_h; i++)
             {
@@ -183,7 +183,7 @@ namespace Labirint_prog
         {
         }
 
-        public void delWall(int n1, int n2) // удаляет "стену" между ячейками
+        public void delWall(int n1, int n2) // удаляет "стену" между двумя ячейками
         {
             if (n1 < 0 || n2 < 0 || n1 > maxnum || n2 > maxnum)
                 throw new Exception("Функции delWall() передан(ы) неверный(е) параметр(ы).");
@@ -194,13 +194,13 @@ namespace Labirint_prog
             int j2 = n2 % width;
 
             if (i2 - i1 < 0 && j1 == j2)
-                Hole(n1, 'c');  // прорубить ход от первой ячейки вверх
+                Hole(n1, 'c');  // прорубить ход от первой ячейки ко второй вверх
             else if (i2 - i1 > 0 && j1 == j2)
-                Hole(n1, 'f');  // прорубить ход от первой ячейки вниз
+                Hole(n1, 'f');  // прорубить ход от первой ячейки ко второй вниз
             else if (j2 - j1 < 0 && i1 == i2)
-                Hole(n1, 'l');  // прорубить ход от первой ячейки влево
+                Hole(n1, 'l');  // прорубить ход от первой ячейки ко второй влево
             else if (j2 - j1 > 0 && i1 == i2)
-                Hole(n1, 'r');  // прорубить ход от первой ячейки вправо
+                Hole(n1, 'r');  // прорубить ход от первой ячейки ко второй вправо
         }
 
         public int Next_step(int curr_num)
@@ -291,8 +291,9 @@ namespace Labirint_prog
 
                 int current = 0; // элемент с которого нужно начать
                 lab.Use_cell(current);
-                lab.Hole(current, 'l');    // вход в лабиринт (номер ячейки; правая, левая стена, пол 
-                //или потолок)
+                lab.Hole(current, 'l');    	// вход в лабиринт 
+                							//(номер ячейки; правая('r'), левая('l') стена, пол('f') 
+                							//или потолок('c'))
 
                 Stack<int> stack_of_cells = new Stack<int>();
                 stack_of_cells.Push(height * width - 1);
