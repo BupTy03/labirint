@@ -10,9 +10,9 @@ namespace Labirint_prog
             public int y;   // координаты в print_arr
             public int x;
             public bool use;	// использована ли ячейка
-            public int num;		// порядковый номер ячейки
+            public int num;     // порядковый номер ячейки
 
-            	// наличие/отсутствие границ
+            // наличие/отсутствие границ
             public bool right_w;    // справа
             public bool left_w;     // слева
             public bool ceiling;    // сверху
@@ -64,44 +64,22 @@ namespace Labirint_prog
             print_arr = new bool[print_h, print_w];
             init_cells();
 
-            for (int i = 0; i < print_h; i++)
-            {   // границы и сетка
+            for (int i = 0; i < print_h; i++)   // границы и сетка
                 for (int j = 0; j < print_w; j++)
-                {
-                    if (i % h_of_cell == 0 || j % w_of_cell == 0) // сетка 
-                        print_arr[i, j] = true;
-                    else
-                        print_arr[i, j] = false;
-                }
-            }
+                    print_arr[i, j] = (i % h_of_cell == 0 || j % w_of_cell == 0);
         }
 
         protected void init_cells() // инициализирует ячейки
         {
             int n = 0;
             for (int i = 0; i < height; i++)
+            {
                 for (int j = 0; j < width; j++)
-                {
-
-                    if (i == 0)
-                        arr_of_c[i, j].ceiling = false;
-                    else
-                        arr_of_c[i, j].ceiling = true;
-
-                    if (j == 0)
-                        arr_of_c[i, j].left_w = false;
-                    else
-                        arr_of_c[i, j].left_w = true;
-
-                    if (i == height - 1)
-                        arr_of_c[i, j].floor = false;
-                    else
-                        arr_of_c[i, j].floor = true;
-
-                    if (j == width - 1)
-                        arr_of_c[i, j].right_w = false;
-                    else
-                        arr_of_c[i, j].right_w = true;
+                {                    
+                    arr_of_c[i, j].ceiling  = (i != 0);
+                    arr_of_c[i, j].left_w   = (j != 0);
+                    arr_of_c[i, j].floor    = (i != height - 1);
+                    arr_of_c[i, j].right_w  = (j != width - 1);
 
                     arr_of_c[i, j].use = false;
 
@@ -111,24 +89,14 @@ namespace Labirint_prog
                     arr_of_c[i, j].num = n;
                     n++;
                 }
+            }
         }
         public void Use_cell(int n) // отмечает использованные ячейки
         {
             check_range(n, 0, maxnum);
             arr_of_c[n / width, n % width].use = true;
         }
-        public void Use_cell(int i, int j)
-        {
-            check_range(i, 0, height - 1);
-            check_range(j, 0, width - 1);
-            arr_of_c[i, j].use = true;
-        }
-        public bool IsUsed(int n)   // проверяет не использована ли ячейка
-        {
-            check_range(n, 0, maxnum);
-            return arr_of_c[n / width, n % width].use;
-        }
-        public bool IsUsed(int i, int j)
+        public bool IsUsed(int i, int j)    // проверяет не использована ли ячейка
         {
             check_range(i, 0, height - 1);
             check_range(j, 0, width - 1);
@@ -149,17 +117,7 @@ namespace Labirint_prog
             int i = n / width;
             int j = n % width;
 
-            return  arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use  ||
-                    arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use ||
-                    arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use ||
-                    arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use;
-        }
-        public bool Unused_neighbors(int i, int j)
-        {
-            check_range(i, 0, height - 1);
-            check_range(j, 0, width - 1);
-
-            return  arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use  ||
+            return arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use ||
                     arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use ||
                     arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use ||
                     arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use;
@@ -332,7 +290,7 @@ namespace Labirint_prog
 
                 lab.Print();
             }
-            catch(System.ArgumentOutOfRangeException)
+            catch (System.ArgumentOutOfRangeException)
             {
                 System.Console.WriteLine("Выход за пределы диапазона");
             }
