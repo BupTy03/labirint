@@ -203,7 +203,7 @@ namespace Labirint_prog
                 Hole(n1, 'r');  // прорубить ход от первой ячейки ко второй вправо
         }
 
-        public int Next_step(int curr_num)
+        public int Next_step(int curr_num)  // выбирает следующую соседнюю ячейку
         {
             if (curr_num < 0 || width <= 0)
                 throw new Exception("Функции Next_step() передан(ы) неверный(е) параметр(ы).");
@@ -213,33 +213,33 @@ namespace Labirint_prog
             Random rand = new Random(Convert.ToInt32(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds));
 
             int next = 0;
-            bool k = true;
-            while (k)
+            while (true)
             {
-                int new_i = rand.Next(height), new_j = rand.Next(width);
+                int new_i = rand.Next(height);
+                int new_j = rand.Next(width);
                 if (new_i != i && new_j == j && new_i - i == 1 && arr_of_c[i, j].floor && !IsUsed(new_i, new_j))
                 {
                     next = new_i * width + j;
-                    k = false;
+                    break;
                 }
                 else if (new_i != i && new_j == j && i - new_i == 1 && arr_of_c[i, j].ceiling && !IsUsed(new_i, new_j))
                 {
                     next = new_i * width + j;
-                    k = false;
+                    break;
                 }
                 else if (new_j != j && new_i == i && new_j - j == 1 && arr_of_c[i, j].right_w && !IsUsed(new_i, new_j))
                 {
                     next = i * width + new_j;
-                    k = false;
+                    break;
                 }
                 else if (new_j != j && new_i == i && j - new_j == 1 && arr_of_c[i, j].left_w && !IsUsed(new_i, new_j))
                 {
                     next = i * width + new_j;
-                    k = false;
+                    break;
                 }
             }
             return next;
-        }   // выбирает следующую соседнюю ячейку
+        }
 
         public void Hole(int num, char wall)   // "прорубает" вход и выход
         {
@@ -291,9 +291,9 @@ namespace Labirint_prog
 
                 int current = 0; // элемент с которого нужно начать
                 lab.Use_cell(current);
-                lab.Hole(current, 'l');    	// вход в лабиринт 
-                							//(номер ячейки; правая('r'), левая('l') стена, пол('f') 
-                							//или потолок('c'))
+                lab.Hole(current, 'l');     // вход в лабиринт 
+                                            //(номер ячейки; правая('r'), левая('l') стена, пол('f') 
+                                            //или потолок('c'))
 
                 Stack<int> stack_of_cells = new Stack<int>();
                 stack_of_cells.Push(height * width - 1);
