@@ -11,27 +11,46 @@ namespace Labirint_prog
             public int x;
             public bool use;	// использована ли ячейка
             public int num;		// порядковый номер ячейки
-            // наличие/отсутствие границ
+
+            	// наличие/отсутствие границ
             public bool right_w;    // справа
             public bool left_w;     // слева
             public bool ceiling;    // сверху
             public bool floor;      // снизу
         }
 
-        protected int height;    // высота
-        protected int width;    // ширина
-        protected int h_of_cell;    // высота клетки
-        protected int w_of_cell;    // ширина клетки
-        protected int print_h;    // высота массива "для печати"
-        protected int print_w;    // ширина массива "для печати"
-        protected int maxnum;     // максимальный индекс элемента
-        protected cell[,] arr_of_c;   // сама матрица
-        protected bool[,] print_arr;  // массив "для печати"
+        protected const int max_cells_count = 1000; // максимальное число ячеек
+        protected const int min_cells_count = 1;    // минимальное число ячеек
+        protected const int max_cell_size = 100;    // максимальный размер ячейки
+        protected const int min_cell_size = 1;      // минимальный размер ячейки
+
+        protected int height;    		// высота
+        protected int width;    		// ширина
+        protected int h_of_cell;    	// высота клетки
+        protected int w_of_cell;    	// ширина клетки
+        protected int print_h;    		// высота массива "для печати"
+        protected int print_w;    		// ширина массива "для печати"
+        protected int maxnum;     		// максимальный индекс элемента
+        protected cell[,] arr_of_c;   	// сама матрица
+        protected bool[,] print_arr;  	// массив "для печати"
+
+        protected void error(string name)
+        {
+            throw new Exception(name);
+        }
+
+        protected void check_range(int x, int lo, int hi)
+        {
+            if (x < lo || x > hi)
+                throw new ArgumentOutOfRangeException();
+        }
 
         public Matrix(int height, int width, int h_of_cell = 2, int w_of_cell = 5)
         {
-            if (height <= 0 || width <= 0 || h_of_cell <= 0 || w_of_cell <= 0)
-                throw new Exception("Параметры конструктора класса Matrix должны быть больше нуля.");
+            check_range(height, min_cells_count, max_cells_count);
+            check_range(width, min_cells_count, max_cells_count);
+            check_range(h_of_cell, min_cell_size, max_cell_size);
+            check_range(w_of_cell, min_cell_size, max_cell_size);
 
             this.height = height;
             this.width = width;
@@ -95,26 +114,24 @@ namespace Labirint_prog
         }
         public void Use_cell(int n) // отмечает использованные ячейки
         {
-            if (n < 0)
-                throw new Exception("Функции Use_cell() передан параметр меньший нуля.");
+            check_range(n, 0, maxnum);
             arr_of_c[n / width, n % width].use = true;
         }
         public void Use_cell(int i, int j)
         {
-            if (i < 0 || j < 0)
-                throw new Exception("Функции Use_cell() передан параметр меньший нуля.");
+            check_range(i, 0, height - 1);
+            check_range(j, 0, width - 1);
             arr_of_c[i, j].use = true;
         }
         public bool IsUsed(int n)   // проверяет не использована ли ячейка
         {
-            if (n < 0)
-                throw new Exception("Функции IsUsed() передан параметр меньший нуля.");
+            check_range(n, 0, maxnum);
             return arr_of_c[n / width, n % width].use;
         }
         public bool IsUsed(int i, int j)
         {
-            if (i < 0 || j < 0)
-                throw new Exception("Функции IsUsed() передан параметр меньший нуля.");
+            check_range(i, 0, height - 1);
+            check_range(j, 0, width - 1);
             return arr_of_c[i, j].use;
         }
         public bool Unused_cells()  // проверяет остались ли неиспользованные ячейки
@@ -128,38 +145,24 @@ namespace Labirint_prog
         }
         public bool Unused_neighbors(int n)  // проверяет остались ли неиспользованные ячейки по соседству
         {
-            if (n < 0)
-                throw new Exception("Функции Unused_neighbors() передан параметр меньший нуля.");
-            bool flag = false;
+            check_range(n, 0, maxnum);
             int i = n / width;
             int j = n % width;
-            if (arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use)
-                flag = true;
-            if (arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use)
-                flag = true;
-            if (arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use)
-                flag = true;
-            if (arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use)
-                flag = true;
 
-            return flag;
+            return  arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use  ||
+                    arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use ||
+                    arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use ||
+                    arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use;
         }
         public bool Unused_neighbors(int i, int j)
         {
-            if (i < 0 || j < 0)
-                throw new Exception("Функции Unused_neighbors() передан параметр меньший нуля.");
-            bool flag = false;
+            check_range(i, 0, height - 1);
+            check_range(j, 0, width - 1);
 
-            if (arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use)
-                flag = true;
-            if (arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use)
-                flag = true;
-            if (arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use)
-                flag = true;
-            if (arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use)
-                flag = true;
-
-            return flag;
+            return  arr_of_c[i, j].left_w && !arr_of_c[i, j - 1].use  ||
+                    arr_of_c[i, j].right_w && !arr_of_c[i, j + 1].use ||
+                    arr_of_c[i, j].ceiling && !arr_of_c[i - 1, j].use ||
+                    arr_of_c[i, j].floor && !arr_of_c[i + 1, j].use;
         }
 
         public void Print()	// "печатает" результат в консоль
@@ -167,11 +170,8 @@ namespace Labirint_prog
             for (int i = 0; i < print_h; i++)
             {
                 for (int j = 0; j < print_w; j++)
-                {
-                    if (print_arr[i, j])
-                        Console.Write('#');
-                    else Console.Write(' ');
-                }
+                    Console.Write((print_arr[i, j]) ? '#' : ' ');
+
                 Console.WriteLine();
             }
         }
@@ -185,8 +185,8 @@ namespace Labirint_prog
 
         public void delWall(int n1, int n2) // удаляет "стену" между двумя ячейками
         {
-            if (n1 < 0 || n2 < 0 || n1 > maxnum || n2 > maxnum)
-                throw new Exception("Функции delWall() передан(ы) неверный(е) параметр(ы).");
+            check_range(n1, 0, maxnum);
+            check_range(n2, 0, maxnum);
 
             int i1 = n1 / width;
             int j1 = n1 % width;
@@ -205,8 +205,8 @@ namespace Labirint_prog
 
         public int Next_step(int curr_num)  // выбирает следующую соседнюю ячейку
         {
-            if (curr_num < 0 || width <= 0)
-                throw new Exception("Функции Next_step() передан(ы) неверный(е) параметр(ы).");
+            check_range(curr_num, 0, maxnum);
+
             int i = curr_num / width;
             int j = curr_num % width;
 
@@ -243,6 +243,8 @@ namespace Labirint_prog
 
         public void Hole(int num, char wall)   // "прорубает" вход и выход
         {
+            check_range(num, 0, maxnum);
+
             int i = num / width;
             int j = num % width;
 
@@ -264,76 +266,75 @@ namespace Labirint_prog
                     for (int k = 1; k < h_of_cell; k++)
                         print_arr[arr_of_c[i, j].y + k, arr_of_c[i, j].x + w_of_cell] = false;
                     break;
+                default:
+                    error("Неверный формат: ожидалось 'c', 'f', 'l' или 'r'");
+                    break;
             }
         }
     }
 
     class MainClass
     {
+        public static bool isInRange(int x, int lo, int hi) // проверяет находится ли x в диапазоне lo hi
+        {
+            return x >= lo && x <= hi;
+        }
 
         public static void Main(string[] args)
         {
 
             try
             {
+                const int max_high = 1000;
+                const int max_width = 1000;
+                const int min_high = 1;
+                const int min_width = 1;
+
                 int height = 0, width = 0;
-                while (height <= 0 || width <= 0)
+                while (!isInRange(height, min_high, max_high) || !isInRange(width, min_width, max_width))
                 {
                     Console.Write("Введите высоту лабиринта(целое положительное число)\n> ");
                     height = Convert.ToInt32(Console.ReadLine());
                     Console.Write("Введите ширину лабиринта(целое положительное число)\n> ");
                     width = Convert.ToInt32(Console.ReadLine());
-                    if (height <= 0 || width <= 0)
+                    if (!isInRange(height, min_high, max_high) || !isInRange(width, min_width, max_width))
                         Console.Write("Пожалуйста, повторите ввод:\n");
                 }
                 Labirint lab = new Labirint(height, width, 2, 4);
                 Random run = new Random(Convert.ToInt32(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds));
 
-                int current = 0; // элемент с которого нужно начать
+                int current = 0;            // элемент с которого нужно начать
                 lab.Use_cell(current);
                 lab.Hole(current, 'l');     // вход в лабиринт 
                                             //(номер ячейки; правая('r'), левая('l') стена, пол('f') 
                                             //или потолок('c'))
 
-                Stack<int> stack_of_cells = new Stack<int>();
-                stack_of_cells.Push(height * width - 1);
-                lab.Hole(height * width - 1, 'r');
+                Stack<int> stack_of_cells = new Stack<int>();   // стек ячеек
+                stack_of_cells.Push(height * width - 1);        // добавляем последнюю ячейку в стек(для выхода)
+                lab.Hole(height * width - 1, 'r');              // прорубаем выход
 
-                while (lab.Unused_cells())
+                while (lab.Unused_cells())  // пока остались неиспользованные ячейки
                 {
-                    if (lab.Unused_neighbors(current))
+                    if (lab.Unused_neighbors(current))  // если у текущей ячейки остались неиспользованные соседи
                     {
-                        stack_of_cells.Push(current);
-                        int next = lab.Next_step(current);
-                        lab.delWall(current, next);
-                        current = next;
-                        lab.Use_cell(current);
+                        stack_of_cells.Push(current);       // добавляем текущую ячейку в стек
+                        int next = lab.Next_step(current);  // вычисляем номер следующей ячейки
+                        lab.delWall(current, next);         // удаляем "стену" между текущей и следующей ячейкой
+                        current = next;                     // следующая ячейка становится текущей
+                        lab.Use_cell(current);              // помечаем следующую ячейку как использованную
                     }
-                    else if (stack_of_cells.Count > 0)
-                    {
-                        current = stack_of_cells.Pop();
-                        lab.Use_cell(current);
-                    }
-                    else
-                    {
-                        if (lab.Unused_cells())
-                        {
-                            while (true)
-                            {
-                                Console.WriteLine('E');
-                                current = run.Next(height * width);
-                                if (!lab.IsUsed(current))
-                                {
-                                    lab.Use_cell(current);
-                                    break;
-                                }
-                            }
-                        }
-                        else break;
+                    else if (stack_of_cells.Count > 0)      // если неиспользованных соседей нет
+                    {                                       // и в стеке ещё остались ячейки
+                        current = stack_of_cells.Pop();     // ячейка из стека становится текущей
+                        lab.Use_cell(current);              // помечаем как использованную
                     }
                 }
 
                 lab.Print();
+            }
+            catch(System.ArgumentOutOfRangeException)
+            {
+                System.Console.WriteLine("Выход за пределы диапазона");
             }
             catch (System.ArgumentNullException)
             {
@@ -341,7 +342,7 @@ namespace Labirint_prog
             }
             catch (System.FormatException)
             {
-                System.Console.WriteLine("Ошибка формата ввода :(");
+                System.Console.WriteLine("Ошибка: неправильный ввод :(");
             }
             catch (Exception e)
             {
